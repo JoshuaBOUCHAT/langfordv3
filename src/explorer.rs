@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, thread};
 
 use crate::langford::{LangfordSate, N};
 
@@ -52,22 +52,40 @@ impl Explorer {
 }
 
 pub fn compute_langford() -> u64 {
-    let mut start = Explorer::init_from_start();
-    let mut end = Explorer::init_from_end();
+    let mut start_explorer = Explorer::init_from_start();
+    let mut end_explorer = Explorer::init_from_end();
 
     let end_iter_count = N / 2;
     let start_iter_count = N - end_iter_count;
-    for _ in 0..end_iter_count {
-        end = end.explore_up();
-    }
-    for _ in 0..start_iter_count {
-        start = start.explore_down();
-    }
+
+    let (start_result, end_result) = thread::scope(|s| {
+        let end_handle = s.spawn(move || {
+            for _ in 0..end_iter_count {
+                end_explorer = end_explorer.explore_up();
+            }
+            println!("end finished !");
+            end_explorer
+        });
+
+        let start_handle = s.spawn(move || {
+            for _ in 0..start_iter_count {
+                start_explorer = start_explorer.explore_down();
+            }
+            start_explorer
+        });
+
+        (
+            start_handle.join().expect("start thread panicked"),
+            end_handle.join().expect("end thread panicked"),
+        )
+    });
+
     let mut total_count = 0;
-    for (state, nb) in start.states {
-        if let Some(nb2) = end.states.get(&state) {
-            total_count += nb * nb2
+    for (state, nb1) in start_result.states {
+        if let Some(nb2) = end_result.states.get(&state) {
+            total_count += nb1 * nb2;
         }
     }
+
     total_count
 }
