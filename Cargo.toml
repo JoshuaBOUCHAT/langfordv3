@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+co_sort = "0.2.0"
 parking_lot = "0.12.4"
 rayon = "1.10.0"

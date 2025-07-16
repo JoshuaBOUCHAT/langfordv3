@@ -4,15 +4,15 @@ use crate::{N, SIZE};
 
 #[repr(transparent)]
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Hash, Default)]
-pub struct LangfordSate {
-    state: u64,
+pub struct LangfordState {
+    pub state: u64,
 }
 
-impl std::ops::Add<u64> for LangfordSate {
+impl std::ops::Add<u64> for LangfordState {
     type Output = Option<Self>;
     fn add(self, rhs: u64) -> Self::Output {
         if self.state & rhs == 0 {
-            Some(LangfordSate {
+            Some(LangfordState {
                 state: self.state | rhs,
             })
         } else {
@@ -21,11 +21,11 @@ impl std::ops::Add<u64> for LangfordSate {
     }
 }
 
-impl std::ops::Sub<u64> for LangfordSate {
+impl std::ops::Sub<u64> for LangfordState {
     type Output = Option<Self>;
     fn sub(self, mask: u64) -> Self::Output {
         if self.state & mask == mask {
-            Some(LangfordSate {
+            Some(LangfordState {
                 //as mask is compose of only two bit set two one and the if garentie that all bit match then doing self.state & (~mask)  is equivalent
                 state: self.state ^ mask,
             })
@@ -35,7 +35,7 @@ impl std::ops::Sub<u64> for LangfordSate {
     }
 }
 
-impl fmt::Display for LangfordSate {
+impl fmt::Display for LangfordState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Affiche de gauche à droite, bit le plus significatif en premier
         for i in (0..SIZE).rev() {
@@ -58,7 +58,7 @@ const fn get_array() -> [u64; 20] {
 
 const MASK: [u64; 20] = get_array();
 
-impl LangfordSate {
+impl LangfordState {
     pub fn get_child_iter(self) -> impl Iterator<Item = Self> {
         let x = (self.state.count_ones() / 2) as usize;
         let space = N - x;
