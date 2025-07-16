@@ -1,8 +1,8 @@
 use core::fmt;
 
-pub const N: usize = 16;
-pub const SIZE: usize = 2 * N;
+use crate::{N, SIZE};
 
+#[repr(transparent)]
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Hash, Default)]
 pub struct LangfordSate {
     state: u64,

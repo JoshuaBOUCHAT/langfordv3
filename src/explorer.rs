@@ -1,4 +1,6 @@
-use crate::langford::{LangfordSate, N};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
+
+use crate::langford::LangfordSate;
 use std::collections::BTreeMap;
 
 pub struct Explorer {
@@ -45,33 +47,4 @@ impl Explorer {
 
         Explorer { states: new_map }
     }
-}
-
-pub fn compute_langford() -> u64 {
-    let mut start_explorer = Explorer::init_from_start();
-    let mut end_explorer = Explorer::init_from_end();
-
-    let end_iter_count = 7;
-    let start_iter_count = 9;
-
-    for _ in 0..end_iter_count {
-        end_explorer = end_explorer.explore_up();
-    }
-    println!("end finished size: {}", end_explorer.states.len());
-
-    for _ in 0..start_iter_count {
-        start_explorer = start_explorer.explore_down();
-    }
-    println!("start finished size: {}", start_explorer.states.len());
-
-    let (start_result, end_result) = (start_explorer, end_explorer);
-
-    let mut total_count = 0;
-    for (state, nb1) in start_result.states {
-        if let Some(nb2) = end_result.states.get(&state) {
-            total_count += nb1 * nb2;
-        }
-    }
-
-    total_count
 }
